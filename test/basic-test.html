@@ -1,0 +1,115 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+
+    <!-- Step 1: import the element to test -->
+    <link rel="import" href="../pr-button.html">
+  </head>
+  <body>
+
+    <!-- You can use the document as a place to set up your fixtures. -->
+    <test-fixture id="pr-button-fixture">
+      <template>
+        <pr-button>
+          Label
+        </pr-button>
+      </template>
+    </test-fixture>
+
+    <script>
+      suite('<pr-button>', function() {
+
+        var prButton;
+
+        setup(function() {
+          prButton = fixture('pr-button-fixture');
+          prButton.primary = true;
+        });
+
+        test('defines a primary button', function() {
+          assert.isTrue(prButton.primary, 'Is a primary button');
+        });
+
+        test('defines a primary button', function() {
+          prButton.disabled = true;
+          assert.isTrue(prButton.disabled, 'The button is disabled');
+        });
+
+        //toggles, toggle-active, disabled, has-loader, loading
+        test('defines a primary button', function() {
+          prButton.typeLink = true;
+          assert.isTrue(prButton.typeLink, 'The button is a typeLink');
+        });
+
+        test('defines a toggles button', function() {
+          prButton.toggles = true;
+          prButton.toggleActive = false;
+          assert.isTrue(prButton.toggles, 'The button is toggles');
+          assert.isNotTrue(prButton.toggleActive, '... and is not active');
+
+          prButton.dispatchEvent(new CustomEvent('tap', {bubbles: true}));
+          assert.isTrue(prButton.toggleActive, '... after tap is active');
+
+          prButton.disabled = true;
+          prButton.dispatchEvent(new CustomEvent('tap', {bubbles: true}));
+          assert.isTrue(prButton.toggleActive, '... disabled stop the tap action');
+
+          prButton.disabled = false;
+          prButton.loading = true;
+          prButton.dispatchEvent(new CustomEvent('tap', {bubbles: true}));
+          assert.isTrue(prButton.toggleActive, '... loading stop the tap action');
+
+          prButton.disabled = false;
+          prButton.loading = false;
+          prButton.toggles = false;
+          prButton.dispatchEvent(new CustomEvent('tap', {bubbles: true}));
+          assert.isTrue(prButton.toggleActive, '... not defining toggles stop the tap action');
+        });
+
+        test('defines the button is loading', function() {
+          prButton.loading = true;
+          assert.match(prButton.textContent, /Loading.../, '... have a "Loading..." text');
+          prButton.loading = false;
+          assert.match(prButton.textContent, /Label/, '... has a textContet "Label"');
+        });
+
+        test('defines the button is fire the event loading-changed true to false', function(done) {
+          prButton.loading = true;
+
+          prButton.addEventListener('loading-changed', function(event) {
+            assert.equal(event.detail.value, false);
+            done();
+          });
+
+          prButton.loading = false;
+        });
+
+        test('defines the button is fire the event loading-changed false to true', function(done) {
+          prButton.loading = false;
+
+          prButton.addEventListener('loading-changed', function(event) {
+            assert.equal(event.detail.value, true);
+            done();
+          });
+
+          prButton.loading = true;
+        });
+      });
+    </script>
+
+  </body>
+</html>
