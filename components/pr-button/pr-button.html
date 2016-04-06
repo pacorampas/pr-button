@@ -1,0 +1,239 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+An element providing a solution to no problem in particular.
+
+Example:
+    You can set the next attributtes: primary, disabled, type-link, toggles,
+    toggle-active, disabled, has-loader, loading
+
+    <pr-button [primary, disabled, type-link, toggles,
+    toggle-active, disabled, has-loader, loading]>Text to button</pr-button>
+
+Example:
+
+    <pr-button primary>
+      Hello pr-button
+    </pr-button>
+
+### Styling
+
+The following custom properties are available for styling:
+
+`--pr-button-border-color`
+
+`--pr-button-border-radius`
+
+`--pr-button-active-background`
+
+`--pr-button-color`
+
+`--pr-button-active-border-color`
+
+`--pr-button-active-background`
+
+`--pr-button-active-color`
+
+`--pr-button-primary-background`
+
+`--pr-button-primary-color`
+
+`--pr-button-primary-active-background`
+
+`--pr-button-disabled-background`
+
+`--pr-button-disabled-color`
+
+`--pr-button-disabled-background`
+
+`--pr-button-toggle-active-background`
+
+@demo demo/index.html
+@hero hero.svg
+-->
+
+<dom-module id="pr-button">
+  <template>
+    <style>
+      :host {
+        position: relative;
+        display: inline-block;
+        box-sizing: border-box;
+        padding: 12px 14px;
+        border: solid 1px;
+        border-color: var(--pr-button-border-color, #c8a5f2);
+        border-radius: var(--pr-button-border-radius, 18px);
+        font-size: 14px;
+        background: var(--pr-button-active-background, transparent);
+        color: var(--pr-button-color, #750bbd);
+        cursor: pointer;
+        overflow: hidden;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -webkit-user-select: none;
+        user-select: none;
+
+        opacity: 1;
+        transition: opacity 5s;
+      }
+
+      :host:active,
+      :host:hover {
+        border-color: var(--pr-button-active-border-color, #750bbd);
+        background: var(--pr-button-active-background, transparent);
+        color: var(--pr-button-active-color, #3c0566);
+      }
+
+      :host[primary] {
+        border-color: var(--pr-button-primary-background, #750bbd);
+        background: var(--pr-button-primary-background, #750bbd);
+        color: var(--pr-button-primary-color, #ffffff);
+      }
+
+      :host[primary]:hover,
+      :host[primary]:active {
+        background: var(--pr-button-primary-active-background, #3c0566);
+      }
+
+      :host[disabled],
+      :host[disabled][toggles][toggle-active] {
+        border-color: transparent;
+        background: var(--pr-button-disabled-background, #eeeeee);
+        color: var(--pr-button-disabled-color, #999999);
+        cursor: default;
+      }
+
+      :host[type-link] {
+        border: transparent;
+        background: transparent;
+      }
+
+      :host[type-link]:hover,
+      :host[type-link]:active {
+        border: transparent;
+        background: transparent;
+        background: var(--pr-button-disabled-background, #eeeeee);
+      }
+
+      :host[toggles][toggle-active] {
+        border-color: var(--pr-button-toggle-active-background, #e3d2fc);
+        background: transparent;
+        background: var(--pr-button-toggle-active-background, #e3d2fc);
+      }
+    </style>
+    <content></content>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'pr-button',
+
+      properties: {
+        /**
+         * `primary` indicates that the button have an impactant call to action
+         *
+         * @type Boolean
+         */
+        primary: Boolean,
+
+        /**
+         * `disabled` indicates that the button haven't interaction
+         *
+         * @type Boolean
+         */
+        disabled: Boolean,
+
+        /**
+         * `typeLink` indicates that the button haven't border or background
+         * only have text
+         *
+         * @type Boolean
+         */
+        typeLink: Boolean,
+
+        /**
+         * `toggles` indicates that the button have the toggle behavior, so
+         * if the user clicks the button the togleActive properti is setted or
+         * removed
+         *
+         * @type Boolean
+         */
+        toggles: {
+          type: Boolean,
+          reflectToAttribute: false
+        },
+
+        /**
+         * `toggleActive` indicates that the button is toggled or not
+         * @type Boolean
+         */
+        toggleActive: {
+          type: Boolean,
+          reflectToAttribute: true
+        },
+
+        /**
+         * `loading` indicates that the button is in loading state
+         *
+         * @type Boolean
+         *
+         */
+
+        /**
+         *
+         * When the property 'loading' chages the event 'loading-changed' is fired.
+         * You can get the property value on event.detail.value for now if
+         * the new value is true or false
+         *
+         * @event loading-changed
+         */
+        loading: {
+          type: Boolean,
+          reflectToAttribute: true,
+          notify: true,
+          observer: '_handleLoading'
+        }
+
+      },
+
+      listeners: {
+        tap: '_handleTap'
+      },
+
+      detached: function() {
+        this.unlisten(self, 'tap', '_handleTap');
+      },
+
+      _handleTap: function(e) {
+        if (this.toggles && !this.loading && !this.disabled) {
+          this.toggleActive = !this.toggleActive;
+        }
+      },
+
+      _handleLoading: function() {
+        var rootElement = Polymer.dom(this.root);
+        var contentElement = rootElement.querySelector('content');
+        var textElement = Polymer.dom(contentElement).getDistributedNodes();
+        if (!this.value) {
+          this.value = value = textElement[0].data;;
+        }
+        if (this.loading) {
+          textElement[0].data = 'Loading...';
+        } else {
+          var value = textElement[0].data;
+          textElement[0].data = this.value;
+        }
+      }
+    });
+  </script>
+</dom-module>
